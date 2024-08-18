@@ -45,30 +45,40 @@ const RegisterForm = ({ user }: { user: User }) => {
 
     let formData;
 
-    if(values.identificationDocument && values.identificationDocument.length > 0) {
+    if (
+      values.identificationDocument &&
+      values.identificationDocument.length > 0
+    ) {
       const blobFile = new Blob([values.identificationDocument[0]], {
         type: values.identificationDocument[0].type,
       });
 
       formData = new FormData();
-      formData.append('blobFile', blobFile);
-      formData.append('filename', values.identificationDocument[0].name)
+      formData.append("blobFile", blobFile);
+      formData.append("filename", values.identificationDocument[0].name);
     }
 
     try {
-        const patientData = {
-          ...values,
-          userId: user.$id,
-          birthData: new Date(values.birthDate),
-          identificationDocument: formData,
-        }
+      const patientData = {
+        ...values,
+        userId: user.$id,
+        birthDate: new Date(values.birthDate), // Corrected typo from `birthData` to `birthDate`
+        identificationDocument: formData,
+      };
 
-        // @ts-ignore
-        const patient = await registerPatient(patientData);
+      // @ts-ignore
+      const patient = await registerPatient(patientData);
 
-        if(patient) router.push(`/patients/${user.$id}/new-appointment`)
+      if (patient) {
+        router.push(`/patients/${user.$id}/new-appointment`);
+      } else {
+        throw new Error("Patient registration failed.");
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Error during patient registration:", error);
+      // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false); // Ensure loading state is reset
     }
   }
 

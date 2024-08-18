@@ -47,16 +47,17 @@ export const createUser = async (user: CreateUserParams) => {
 export const getUser = async (userId: string) => {
   try {
     const user = await users.get(userId)
-
+    console.log("Fetched user:", user); // Debugging log
     return parseStringify(user);
   } catch (error: any) {
     console.log(error)
   }
 }
 
-export const registerPatient = async({identificationDocument, ...patient}: RegisterUserParams) => {
+export const registerPatient = async({identificationDocument,userId, ...patient}: RegisterUserParams) => {
   try {
     let file;
+    console.log("Fetched user:", userId); // Debugging log
 
     if(identificationDocument){
       const inputFile = InputFile.fromBuffer(
@@ -72,11 +73,16 @@ export const registerPatient = async({identificationDocument, ...patient}: Regis
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        identificationDocumentID: file?.$id || null,
-        identificationDocumentUrl: `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file?.$id}/view?project=${PROJECT_ID}`,
-        ...patient
+        identificationDocumentId: file?.$id ? file.$id : null,
+        identificationDocumentUrl: file?.$id
+          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
+          : null,
+          userId,
+        ...patient,
       }
-    )
+    );
+
+     return parseStringify(newPatient);
 
   } catch (error) {
     console.log(error);

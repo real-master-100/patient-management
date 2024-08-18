@@ -1,4 +1,6 @@
-export const GenderOptions = ["male", "female", "other"];
+export type Gender = "male" | "female" | "other";
+
+export const GenderOptions: Gender[] = ["male", "female", "other"];
 
 export const PatientFormDefaultValues = {
   firstName: "",
